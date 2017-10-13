@@ -971,6 +971,21 @@ pub unsafe fn _mm_loadr_ps(p: *const f32) -> f32x4 {
     simd_shuffle4(a, a, [3, 2, 1, 0])
 }
 
+/// Store four 32-bit floats in aligned memory. To minimize cache pollution, the
+/// data is flagged as non-temporal (unlikely to be used again soon).
+///
+/// The target address must be aligned to a 16-byte boundary. Unaligned memory
+/// will cause a general protection fault (hard program crash).
+///
+/// This intrinsic corresponds to the `MOVNTPS` instruction.
+#[inline(always)]
+#[target_feature = "+sse"]
+#[cfg_attr(test, assert_instr(movntps))]
+pub unsafe fn _mm_stream_ps(dst: *mut f32, src: f32x4) {
+    // debug_assert!(false, "Rust does not yet support non-temporary stores");
+    *(dst as *mut f32x4) = src;
+}
+
 /// Perform a serializing operation on all store-to-memory instructions that
 /// were issued prior to this instruction.
 ///
